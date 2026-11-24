@@ -1,0 +1,25 @@
+title: CI Runner Fetches tj-actions/changed-files Payload Gist (CVE-2025-30066)
+id: 6f3b9a52-0c41-4d0e-9b8e-2a6a1f6d2b11
+status: experimental
+description: >
+  Detects an HTTP request for the gist that the compromised tj-actions/changed-files commit
+  (0e58ed8) downloaded and ran to dump runner memory. The gist path is published in
+  GHSA-mrrh-fwg8-r2c3. Apply to proxy or egress logs from CI runners.
+references:
+  - https://github.com/advisories/GHSA-mrrh-fwg8-r2c3
+author: Seif Abdelhamid
+date: 2026-11-24
+tags:
+  - attack.execution
+  - attack.t1195.002
+  - attack.credential-access
+  - attack.t1552
+logsource:
+  category: proxy
+detection:
+  selection:
+    c-uri|contains: 'gist.githubusercontent.com/nikitastupin/30e525b776c409e03c2d6f328f254965'
+  condition: selection
+falsepositives:
+  - Security researchers deliberately fetching the gist for analysis
+level: critical

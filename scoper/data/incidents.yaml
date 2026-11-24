@@ -1,0 +1,45 @@
+# Incident definitions. Every field is traced in docs/SOURCES.md.
+# Windows are inclusive start, exclusive end, UTC. Where the primary source only gives
+# dates, the window covers the whole days (conservative: over-reports, never under-reports).
+incidents:
+  - id: CVE-2025-30066
+    ghsa: GHSA-mrrh-fwg8-r2c3
+    action: tj-actions/changed-files
+    summary: Tags repointed to a malicious commit that printed runner secrets to the job log.
+    window:
+      start: "2025-03-14T00:00:00Z"
+      end: "2025-03-16T00:00:00Z"
+      precision: day  # GHSA: "between March 14 and March 15, 2025"
+    malicious_shas:
+      - 0e58ed8671d6b60d0890c21b07f8835ace038e67
+    # Maintainer README at the fix commit: the malicious commit "has been removed from all
+    # tags and branches" -> any mutable ref resolved during the window is treated as exposed.
+    mutable_refs_exposed: all
+    fixed_version: "46.0.1"
+    transitive_dependents: []
+    iocs:
+      - gist.githubusercontent.com/nikitastupin/30e525b776c409e03c2d6f328f254965
+      - memdump.py
+    log_encoding: double-base64
+  - id: CVE-2025-30154
+    ghsa: GHSA-qmg3-hpqr-gqvc
+    action: reviewdog/action-setup
+    summary: v1 compromised; malicious code dumped exposed secrets to the workflow log.
+    window:
+      start: "2025-03-11T18:42:00Z"
+      end: "2025-03-11T20:31:00Z"
+      precision: minute  # GHSA: "March 11, 2025, between 18:42 and 20:31 UTC"
+    malicious_shas:
+      - f0d342d24037bb11d26b9bd8496e0808ba32e9ec
+    mutable_refs_exposed: ["v1"]
+    fixed_version: null
+    # GHSA: these use reviewdog/action-setup@v1 internally and were compromised
+    # "regardless of version or pinning method".
+    transitive_dependents:
+      - reviewdog/action-shellcheck
+      - reviewdog/action-composite-template
+      - reviewdog/action-staticcheck
+      - reviewdog/action-ast-grep
+      - reviewdog/action-typos
+    iocs: []
+    log_encoding: unknown
